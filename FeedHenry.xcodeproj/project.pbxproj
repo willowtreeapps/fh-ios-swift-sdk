@@ -400,6 +400,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 			);
 			mainGroup = 4878D5D01B579965004518C4;
@@ -487,7 +488,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cp ${BUILD_ROOT}/Debug-iphonesimulator/FeedHenry.framework/Headers/FeedHenry-Sw.h ${SRCROOT}/FeedHenry/FeedHenry-Sw.h";
+			shellScript = "cp ${BUILD_ROOT}/Debug-iphonesimulator/FeedHenry.framework/Headers/FeedHenry-Swift.h ${SRCROOT}/FeedHenry/FeedHenry-Sw.h\n";
 		};
 		E19AC3B845053E4C8B3F1EEF /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
