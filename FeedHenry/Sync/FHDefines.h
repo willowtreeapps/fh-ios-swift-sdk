@@ -33,7 +33,8 @@ typedef NS_ENUM(NSInteger, FH_ACTION) {
 
 // cater for debug/release mode of logging
 #ifdef DEBUG
-#define DLog(...) NSLog(@"%s(%p) %@", __PRETTY_FUNCTION__, self, [NSString stringWithFormat:__VA_ARGS__])
+#define NSLog(FORMAT, ...) printf("%s %s\n", [[[NSDate date] description] UTF8String], [[NSString stringWithFormat:FORMAT, ##__VA_ARGS__] UTF8String]);
+#define DLog(...) NSLog(@"💜 %s %@", __PRETTY_FUNCTION__, [NSString stringWithFormat:__VA_ARGS__])
 #else
 #define DLog(...) /* */
 #endif

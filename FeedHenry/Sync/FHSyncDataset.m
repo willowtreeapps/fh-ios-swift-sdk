@@ -562,7 +562,7 @@ static NSString *const kUIDMapping = @"uidMapping";
     
     if (resData[@"hash"] && ![resData[@"hash"] isEqualToString:self.hashValue]) {
         NSString *remoteHash = resData[@"hash"];
-        DLog(@"Local dataset stale - syncing records :: local hash= %@ - remoteHash = %@",
+//        DLog(@"Local dataset stale - syncing records :: local hash= %@ - remoteHash = %@",
              self.hashValue, remoteHash);
         // Different hash value returned - Sync individual records
         [self syncRecords];
@@ -672,7 +672,7 @@ static NSString *const kUIDMapping = @"uidMapping";
     }
     syncRecsParams[@"clientRecs"] = clientRecs;
     
-    DLog(@"syncRecParams :: %@", [syncRecsParams JSONString]);
+//    DLog(@"syncRecParams :: %@", [syncRecsParams JSONString]);
     
     [self doCloudCall:syncRecsParams
            AndSuccess:^(FHResponse *response) {
@@ -750,7 +750,7 @@ static NSString *const kUIDMapping = @"uidMapping";
  overridden (blinking disappear / reappear effect).
  */
 - (void)applyPendingChangesToRecords:(NSMutableDictionary *)resData {
-    DLog(@"SyncRecords result = %@ pending = %@", resData, self.pendingDataRecords);
+//    DLog(@"SyncRecords result = %@ pending = %@", resData, self.pendingDataRecords);
     [self.pendingDataRecords enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
         @autoreleasepool {
             FHSyncPendingDataRecord* pendingRecord = (FHSyncPendingDataRecord*)obj;
@@ -773,7 +773,7 @@ static NSString *const kUIDMapping = @"uidMapping";
                     [resRecord removeObjectForKey: pendingRecord.uid];
                 }
             }
-            DLog(@"SyncRecords result after pending removed = %@", resData);
+//            DLog(@"SyncRecords result after pending removed = %@", resData);
         }
     }];
 }
