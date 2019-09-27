@@ -563,7 +563,7 @@ static NSString *const kUIDMapping = @"uidMapping";
     if (resData[@"hash"] && ![resData[@"hash"] isEqualToString:self.hashValue]) {
         NSString *remoteHash = resData[@"hash"];
 //        DLog(@"Local dataset stale - syncing records :: local hash= %@ - remoteHash = %@",
-             self.hashValue, remoteHash);
+//             self.hashValue, remoteHash);
         // Different hash value returned - Sync individual records
         [self syncRecords];
     } else {
