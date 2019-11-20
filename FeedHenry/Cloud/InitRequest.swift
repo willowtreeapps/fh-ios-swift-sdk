@@ -120,6 +120,10 @@ public class InitRequest: Request {
         fhResponse.parsedResponse = respJSON as NSDictionary
         fhResponse.error = nil
 
+        let data = try! JSONSerialization.data(withJSONObject: self.props!, options: .prettyPrinted)
+        fhResponse.rawResponseAsString = String(data: data, encoding: String.Encoding.utf8)
+        fhResponse.rawResponse = data
+
         completionHandler(fhResponse, nil)
 
         // let jsonData = try? JSONSerialization.data(withJSONObject: respJSON, options: .prettyPrinted)
