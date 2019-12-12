@@ -34,29 +34,51 @@ static NSString *const kUIID = @"uid";
     return self;
 }
 
-- (id)initWithData:(NSDictionary *)data {
+- (id)initWithData:(NSObject *)data {
     self = [super init];
     if (self) {
-        if (data[@"data"] && data[@"hash"]) {
+        if ([data isKindOfClass:[NSArray class]]) {
+            NSArray *array = (NSArray *)data;
+
             self.uid = nil;
-            self.data = data[@"data"];
-            self.hashValue = data[@"hash"];
-        } else {
-            self.uid = nil;
-            self.data = data;
+            self.data = array;
             self.hashValue = [FHSyncUtils generateHashForData:self.data];
+
+        } else if ([data isKindOfClass:[NSDictionary class]]) {
+            NSDictionary *dict = (NSDictionary *)data;
+
+            if (dict[@"data"] && dict[@"hash"]) {
+                self.uid = nil;
+                self.data = dict[@"data"];
+                self.hashValue = dict[@"hash"];
+            } else {
+                self.uid = nil;
+                self.data = dict;
+                self.hashValue = [FHSyncUtils generateHashForData:self.data];
+            }
         }
     }
 
     return self;
 }
 
-- (id)initWithUID:(NSString *)uid data:(NSDictionary *)data {
+- (id)initWithUID:(NSString *)uid data:(NSObject *)data {
     self = [super init];
     if (self) {
-        self.uid = uid;
-        self.data = data;
-        self.hashValue = [FHSyncUtils generateHashForData:self.data];
+        if ([data isKindOfClass:[NSArray class]]) {
+            NSArray *array = (NSArray *)data;
+
+            self.uid = uid;
+            self.data = array;
+            self.hashValue = [FHSyncUtils generateHashForData:self.data];
+
+        } else if ([data isKindOfClass:[NSDictionary class]]) {
+            NSDictionary *dict = (NSDictionary *)data;
+
+            self.uid = uid;
+            self.data = dict;
+            self.hashValue = [FHSyncUtils generateHashForData:self.data];
+        }
     }
 
     return self;
