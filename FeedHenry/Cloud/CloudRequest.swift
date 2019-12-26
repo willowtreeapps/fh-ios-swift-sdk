@@ -29,10 +29,10 @@ open class CloudRequest: Request {
     var props: CloudProps?
     var config: Config?
     let dataManager: UserDefaults
-    
+
     /**
      Constructor.
-     
+
      - parameter props: contains the properties retrieved when FH.init is successfully called.
      - parameter config: contains the settings available in `fhconfig.plist`, population by customer or by RHMAP platform at project creation.
      - parameter path: endpoint to call.
@@ -50,20 +50,27 @@ open class CloudRequest: Request {
         self.config = config
         self.dataManager = storage
     }
-    
+
     /**
      Execute method of this command pattern class. It actually does the call to the server.
-     
+
      - parameter completionHandler: closure that runs once the call is completed. To check error parameter.
      */
     open func exec(completionHandler: @escaping CompletionBlock) -> Void {
         let host = props?.cloudHost
         var headers: [String: String]?
+
+        if (self.headers == nil) {
+            headers = [:]
+        } else {
+            headers = self.headers;
+        }
+
         if let sessionToken = dataManager.string(forKey: "sessionToken") {
-            headers = ["x-fh-sessionToken": sessionToken]
+            headers?["x-fh-sessionToken"] = sessionToken;
         }
         if let props = config?.params {
-            headers = headers ?? [:]
+            // headers = headers ?? [:]
             for (key, value) in props {
                 let fhKey = "x-fh-\(key)"
                 if let value = value as? String {
