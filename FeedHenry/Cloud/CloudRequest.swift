@@ -58,28 +58,21 @@ open class CloudRequest: Request {
      */
     open func exec(completionHandler: @escaping CompletionBlock) -> Void {
         let host = props?.cloudHost
-        var headers: [String: String]?
-
-        if (self.headers == nil) {
-            headers = [:]
-        } else {
-            headers = self.headers;
-        }
+        var headers = self.headers ?? [String: String]()
 
         if let sessionToken = dataManager.string(forKey: "sessionToken") {
-            headers?["x-fh-sessionToken"] = sessionToken;
+            headers["x-fh-sessionToken"] = sessionToken
         }
         if let props = config?.params {
-            // headers = headers ?? [:]
             for (key, value) in props {
                 let fhKey = "x-fh-\(key)"
                 if let value = value as? String {
-                    headers![fhKey] = value
+                    headers[fhKey] = value
                 } else { // append JSONified version
                     do {
                         let json = try JSONSerialization.data(withJSONObject: value, options: JSONSerialization.WritingOptions())
                         let string = NSString(data: json, encoding: String.Encoding.utf8.rawValue)
-                        headers![fhKey] = string as String?
+                        headers[fhKey] = string as String?
                     } catch _ {}
                 }
             }

@@ -88,9 +88,9 @@ public class InitRequest: Request {
         assert(config["host"] != nil, "Property file fhconfig.plist must have 'host' defined.")
 
         let host = config["host"]!
-        let env : String? = config["env"] ?? "prod"
-        let title : String? = config["title"] ?? "IOS Client App"
-        let domain : String? = config["domain"] ?? "lovelyclouds.com"
+        let env: String? = config["env"]
+        let title: String? = config["title"]
+        let domain: String? = config["domain"]
 
         // let's pretend the former init cloud call actually happened
         // wasted a lot of time looking for what the trackId is used for in the Cloud
@@ -120,48 +120,12 @@ public class InitRequest: Request {
         fhResponse.parsedResponse = respJSON as NSDictionary
         fhResponse.error = nil
 
-        let data = try! JSONSerialization.data(withJSONObject: respJSON, options: .prettyPrinted)
-        fhResponse.rawResponseAsString = String(data: data, encoding: String.Encoding.utf8)
-        fhResponse.rawResponse = data
+        if let data = try? JSONSerialization.data(withJSONObject: respJSON, options: .prettyPrinted) {
+            fhResponse.rawResponseAsString = String(data: data, encoding: String.Encoding.utf8)
+            fhResponse.rawResponse = data
+        }
 
         completionHandler(fhResponse, nil)
 
-        // let jsonData = try? JSONSerialization.data(withJSONObject: respJSON, options: .prettyPrinted)
-
-        // request(method: method, host: host, path: path, args: args, completionHandler: { (response: Response, err: NSError?) -> Void in
-        //     if let error = err {
-        //         var tagDisabled = false
-        //         if error.code == 400 {
-        //             tagDisabled = true
-        //         }
-        //         let savedProps = UserDefaults.standard.dictionary(forKey: "hosts")
-        //         if (!tagDisabled && savedProps != nil) {
-
-        //             let fhResponse = Response()
-        //             fhResponse.responseStatusCode = error.code
-        //             let data = try! JSONSerialization.data(withJSONObject: savedProps!, options: .prettyPrinted)
-        //             fhResponse.rawResponseAsString = String(data: data, encoding: String.Encoding.utf8)
-        //             fhResponse.rawResponse = data
-        //             fhResponse.parsedResponse = savedProps as NSDictionary?
-
-        //             let cachedResponse = savedProps as [String: AnyObject]?
-        //             self.props = CloudProps(props: cachedResponse!)
-
-        //             completionHandler(fhResponse, nil)
-        //             return
-        //         }
-        //         completionHandler(response, error)
-        //         return
-        //     }
-        //     guard let resp = response.parsedResponse as? [String: AnyObject] else {
-        //         let error = NSError(domain: "FeedHenryHTTPRequestErrorDomain", code: 0, userInfo: [NSLocalizedDescriptionKey : "Invalid Response format. It must be JSON."])
-        //         completionHandler(response, error)
-        //         return
-        //     }
-
-        //     self.props = CloudProps(props: resp)
-        //     UserDefaults.standard.set(response.parsedResponse, forKey: "hosts")
-        //     completionHandler(response, err)
-        // })
     }
 }

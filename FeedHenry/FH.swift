@@ -51,7 +51,7 @@ open class FH: NSObject {
     /// Configuration object. Read form `fhconfig.plist` file.
     public static var username: String = "XXXXXXXX"
     public static var clusterid: String {
-        get { return "\(username[username.index(before: username.endIndex)])" }
+        get { return "\(username.suffix(1))" }
     }
 
     /**
@@ -176,15 +176,14 @@ open class FH: NSObject {
      */
     @objc
     open class func performCloudRequest(_ path: String,  method: String, headers: NSDictionary?, args: NSDictionary?, completionHandler: @escaping CompletionBlock) -> Void {
-        guard let httpMethod = HTTPMethod(rawValue: method) else {return}
+        guard let httpMethod = HTTPMethod(rawValue: method) else { return }
         assert(props != nil, "FH init must be done prior th a Cloud call")
 
-        var cloudHeaders: [String:String];
-        if headers == nil {
-            cloudHeaders = [:];
-        } else {
-            cloudHeaders = headers as! [String:String];
+        var cloudHeaders = [String:String]()
+        if let headers = headers as? [String:String] {
+            cloudHeaders = headers
         }
+
         cloudHeaders["X-MCRA-ClusterID"] = clusterid;
 
         let cloudRequest = CloudRequest(props: self.props, config: self.config, path: path, method: httpMethod, args: args as? [String : AnyObject], headers: cloudHeaders)
@@ -203,11 +202,8 @@ open class FH: NSObject {
      */
     open class func cloud(path: String, method: HTTPMethod = .POST, args: [String: AnyObject]? = nil, headers: [String: String]? = nil, completionHandler: @escaping CompletionBlock) -> Void {
 
-        var cloudHeaders: [String:String]? = headers;
-        if cloudHeaders == nil {
-            cloudHeaders = [:];
-        }
-        cloudHeaders?["X-MCRA-ClusterID"] = clusterid;
+        var cloudHeaders = headers ?? [String: String]()
+        cloudHeaders["X-MCRA-ClusterID"] = clusterid;
 
         let cloudRequest = CloudRequest(props: self.props, config: self.config, path: path, method: method, args: args, headers: cloudHeaders)
         cloudRequest.exec(completionHandler: completionHandler)
@@ -224,11 +220,8 @@ open class FH: NSObject {
     open class func cloudRequest(path: String, method: HTTPMethod = .POST, args:[String: AnyObject]? = nil, headers: [String: String]? = nil) -> CloudRequest {
         assert(props != nil, "FH init must be done prior th a Cloud call")
 
-        var cloudHeaders: [String:String]? = headers;
-        if cloudHeaders == nil {
-            cloudHeaders = [:];
-        }
-        cloudHeaders?["X-MCRA-ClusterID"] = clusterid;
+        var cloudHeaders = headers ?? [String: String]()
+        cloudHeaders["X-MCRA-ClusterID"] = clusterid;
 
         return CloudRequest(props: self.props, config: self.config, path: path, method: method, args: args, headers: headers)
     }
