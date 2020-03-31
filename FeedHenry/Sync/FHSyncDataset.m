@@ -817,11 +817,11 @@ static NSString *const kUIDMapping = @"uidMapping";
  */
 - (void)syncCompleteWithCode:(NSString *)code syncNotification:(NSString*)notification {
     NSString* message = code?code: @"unknown error";
-    self.syncRunning = NO;
-    self.syncLoopEnd = [NSDate date];
     NSMutableDictionary* newQueryParams = [self.queryParams mutableCopy];
     newQueryParams[@"manualRefresh"] = @NO;
     self.queryParams = newQueryParams;
+    self.syncRunning = NO;
+    self.syncLoopEnd = [NSDate date];
     BOOL isMainThread = [NSThread isMainThread];
     if (isMainThread) {
         [self performSelectorInBackground:@selector(saveToFileAndNofiy:)

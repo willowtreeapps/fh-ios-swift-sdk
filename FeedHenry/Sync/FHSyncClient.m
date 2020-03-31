@@ -287,10 +287,10 @@
 - (void)forceSync:(NSString*)dataSetId {
     FHSyncDataset *dataSet = _dataSets[dataSetId];
     if (dataSet) {
-        dataSet.syncLoopPending = YES;
         NSMutableDictionary* newQueryParams = [dataSet.queryParams mutableCopy];
         newQueryParams[@"manualRefresh"] = @YES;
         dataSet.queryParams = newQueryParams;
+        dataSet.syncLoopPending = YES;
     }
 }
 
