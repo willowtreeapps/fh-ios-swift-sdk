@@ -139,7 +139,7 @@
 + (NSString *)generateHashForData:(id)data {
     id results = [FHSyncUtils sortData:data];
     NSString *jsonStr = [results JSONString];
-    DLog(@"sorted data = %@", jsonStr);
+//    DLog(@"sorted data = %@", jsonStr);
     return [FHSyncUtils generateHashWithString:jsonStr];
 }
 

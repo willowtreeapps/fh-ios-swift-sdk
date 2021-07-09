@@ -47,6 +47,13 @@ open class FH: NSObject {
     static var props: CloudProps?
     /// Configuration object. Read form `fhconfig.plist` file.
     static var config: Config?
+
+    /// Configuration object. Read form `fhconfig.plist` file.
+    public static var username: String = "XXXXXXXX"
+    public static var clusterid: String {
+        get { return "\(username.suffix(1))" }
+    }
+
     /**
      Check if the device is online. The device is online if either WIFI or 3G
      network is available. Default value is true.
@@ -54,7 +61,7 @@ open class FH: NSObject {
      - Returns: true if the device is online.
      */
     @objc
-    open static var isOnline: Bool {
+    public static var isOnline: Bool {
         guard let reachability = self.reachability else {return false}
         return reachability.connection != .none
     }
@@ -64,7 +71,7 @@ open class FH: NSObject {
 
      - Returns: the NSError from FH.init method.
      */
-    open static var getInitError: NSError? {
+    public static var getInitError: NSError? {
         return initError
     }
 
@@ -152,6 +159,11 @@ open class FH: NSObject {
         setup(config: Config(), completionHandler: completionHandler)
     }
 
+    /// swift 5 compatible alias to `init`
+    open class func initialize(_ completionHandler: @escaping CompletionBlock) -> Void {
+        setup(config: Config(), completionHandler: completionHandler)
+    }
+
     /**
      Create a new instance of CloudRequest class and execute it immediately
      with the completionHandler closure. The request runs asynchronously.
@@ -164,9 +176,17 @@ open class FH: NSObject {
      */
     @objc
     open class func performCloudRequest(_ path: String,  method: String, headers: NSDictionary?, args: NSDictionary?, completionHandler: @escaping CompletionBlock) -> Void {
-        guard let httpMethod = HTTPMethod(rawValue: method) else {return}
+        guard let httpMethod = HTTPMethod(rawValue: method) else { return }
         assert(props != nil, "FH init must be done prior th a Cloud call")
-        let cloudRequest = CloudRequest(props: self.props, config: self.config, path: path, method: httpMethod, args: args as? [String : AnyObject], headers: headers as? [String : String])
+
+        var cloudHeaders = [String:String]()
+        if let headers = headers as? [String:String] {
+            cloudHeaders = headers
+        }
+
+        cloudHeaders["X-MCRA-ClusterID"] = clusterid;
+
+        let cloudRequest = CloudRequest(props: self.props, config: self.config, path: path, method: httpMethod, args: args as? [String : AnyObject], headers: cloudHeaders)
         cloudRequest.exec(completionHandler: completionHandler)
     }
 
@@ -181,7 +201,11 @@ open class FH: NSObject {
      - parameter completionHandler: Closure to be executed as a callback of http asynchronous call.
      */
     open class func cloud(path: String, method: HTTPMethod = .POST, args: [String: AnyObject]? = nil, headers: [String: String]? = nil, completionHandler: @escaping CompletionBlock) -> Void {
-        let cloudRequest = CloudRequest(props: self.props, config: self.config, path: path, method: method, args: args, headers: headers)
+
+        var cloudHeaders = headers ?? [String: String]()
+        cloudHeaders["X-MCRA-ClusterID"] = clusterid;
+
+        let cloudRequest = CloudRequest(props: self.props, config: self.config, path: path, method: method, args: args, headers: cloudHeaders)
         cloudRequest.exec(completionHandler: completionHandler)
     }
 
@@ -195,6 +219,10 @@ open class FH: NSObject {
      */
     open class func cloudRequest(path: String, method: HTTPMethod = .POST, args:[String: AnyObject]? = nil, headers: [String: String]? = nil) -> CloudRequest {
         assert(props != nil, "FH init must be done prior th a Cloud call")
+
+        var cloudHeaders = headers ?? [String: String]()
+        cloudHeaders["X-MCRA-ClusterID"] = clusterid;
+
         return CloudRequest(props: self.props, config: self.config, path: path, method: method, args: args, headers: headers)
     }
 
@@ -342,7 +370,7 @@ open class FH: NSObject {
      - parameter applicationState: to make sure the app was in background.
      - parameter userInfo: contains the message id used to collect metrics.
      */
-    open class func sendMetricsWhenAppAwoken(applicationState: UIApplicationState, userInfo: [AnyHashable: Any]) {
+    open class func sendMetricsWhenAppAwoken(applicationState: UIApplication.State, userInfo: [AnyHashable: Any]) {
         PushAnalytics.sendMetricsWhenAppAwoken(applicationState: applicationState, userInfo: userInfo)
     }
 

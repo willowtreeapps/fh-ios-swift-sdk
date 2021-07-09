@@ -19,12 +19,12 @@
 @interface FHSyncDataRecord : NSObject
 
 @property (nonatomic, strong) NSString *hashValue;
-@property (nonatomic, strong) NSDictionary *data;
+@property (nonatomic, strong) NSObject *data;
 @property (nonatomic, strong) NSString *uid;
 
 - (instancetype)init;
 
-- (instancetype)initWithData:(NSDictionary *)data;
+- (instancetype)initWithData:(NSObject *)data;
 
 - (NSDictionary *)JSONData;
 

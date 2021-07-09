@@ -1,8 +1,12 @@
 framework module FeedHenry {
   umbrella header "FeedHenry.h"
+  header "FHDefines.h"
+  header "FHSyncDataRecord.h"
+  header "FHSyncPendingDataRecord.h"
+  header "FHSyncUtils.h"
   header "FHSyncClient.h"
   header "FHJSON.h"
-  header "FHSyncconfig.h"
+  header "FHSyncConfig.h"
   header "FHSyncNotificationMessage.h"
   header "FHSyncDelegate.h"
   

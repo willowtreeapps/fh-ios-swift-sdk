@@ -17,6 +17,11 @@
 
 import Foundation
 
+func randomString(length: Int) -> String {
+  let letters = "abcdefghijklmnopqrstuvwxyz0123456789"
+  return String((0..<length).map{ _ in letters.randomElement()! })
+}
+
 /**
  This class provides the layer to do http request.
  */
@@ -28,10 +33,10 @@ public class InitRequest: Request {
     let args: [String: Any]?
     let headers: [String: String]?
     let method: HTTPMethod
-    
+
     /**
      Constructor.
-     
+
      - parameter config: contains the setting available in `fhconfig.plist`, populated by customer or by RHMAP platform at project creation.
      */
     public init(config: Config) {
@@ -43,49 +48,84 @@ public class InitRequest: Request {
         self.props = nil
         self.config = config
     }
-    
+
     /**
      Execute method of this command pattern class. It actually does the call to the server.
-     
+
      - parameter completionHandler: closure that runs once the call is completed. To check error parameter.
+
+        When passed the following config:
+
+        {
+            "cuid": "F04E3F31427745EDB06D7E7EC72E2D36",
+            "cuidMap": null,
+            "destination": "web",
+            "sdk_version": "FH_JS_SDK/3.0.2",
+            "appid": "random-app-id",
+            "appkey": "random-app-key",
+            "projectid": "random-proj-id",
+            "connectiontag": "0.0.8",
+        }
+
+        This is what FeedHenry returned:
+        {
+            "apptitle": "Some IOS App",
+            "domain": "somedom",
+            "firstTime": true,
+            "hosts": {
+                "environment": "envstr",
+                "type": "cloud_nodejs",
+                "url": "https://somedom-random-enenvstrv.mbaas1.qea.feedhenry.com"
+            },
+            "init": {
+                "trackId": "random-track-24-lc-alpha-num"
+            },
+            "status": "ok"
+        }
+
      */
     public func exec(completionHandler: @escaping CompletionBlock) -> Void {
         assert(config["host"] != nil, "Property file fhconfig.plist must have 'host' defined.")
+
         let host = config["host"]!
-        
-        request(method: method, host: host, path: path, args: args, completionHandler: { (response: Response, err: NSError?) -> Void in
-            if let error = err {
-                var tagDisabled = false
-                if error.code == 400 {
-                    tagDisabled = true
-                }
-                let savedProps = UserDefaults.standard.dictionary(forKey: "hosts")
-                if (!tagDisabled && savedProps != nil) {
-                    
-                    let fhResponse = Response()
-                    fhResponse.responseStatusCode = error.code
-                    let data = try! JSONSerialization.data(withJSONObject: savedProps!, options: .prettyPrinted)
-                    fhResponse.rawResponseAsString = String(data: data, encoding: String.Encoding.utf8)
-                    fhResponse.rawResponse = data
-                    fhResponse.parsedResponse = savedProps as NSDictionary?
-                    
-                    let cachedResponse = savedProps as [String: AnyObject]?
-                    self.props = CloudProps(props: cachedResponse!)
-                    
-                    completionHandler(fhResponse, nil)
-                    return
-                }
-                completionHandler(response, error)
-                return
-            }
-            guard let resp = response.parsedResponse as? [String: AnyObject] else {
-                let error = NSError(domain: "FeedHenryHTTPRequestErrorDomain", code: 0, userInfo: [NSLocalizedDescriptionKey : "Invalid Response format. It must be JSON."])
-                completionHandler(response, error)
-                return
-            }
-            self.props = CloudProps(props: resp)
-            UserDefaults.standard.set(response.parsedResponse, forKey: "hosts")
-            completionHandler(response, err)
-        })
+        let env: String? = config["env"]
+        let title: String? = config["title"]
+        let domain: String? = config["domain"]
+
+        // let's pretend the former init cloud call actually happened
+        // wasted a lot of time looking for what the trackId is used for in the Cloud
+        // never found a reason for it so generating a random one
+        let hostsObj: [String: AnyObject] = [
+            "environment": env as AnyObject,
+            "type": "cloud_nodejs" as AnyObject,
+            "url": host as AnyObject
+        ]
+        let initObj: [String: AnyObject] = [
+            "trackId": randomString(length: 24) as AnyObject
+        ]
+        let respJSON: [String: AnyObject] = [
+            "apptitle": title as AnyObject,
+            "domain": domain as AnyObject,
+            "firstTime": true as AnyObject,
+            "hosts": hostsObj as AnyObject,
+            "init": initObj as AnyObject,
+            "status": "ok" as AnyObject
+        ]
+
+        self.props = CloudProps(props: respJSON)
+        UserDefaults.standard.set(respJSON, forKey: "hosts")
+
+        let fhResponse = Response()
+        fhResponse.responseStatusCode = 200
+        fhResponse.parsedResponse = respJSON as NSDictionary
+        fhResponse.error = nil
+
+        if let data = try? JSONSerialization.data(withJSONObject: respJSON, options: .prettyPrinted) {
+            fhResponse.rawResponseAsString = String(data: data, encoding: String.Encoding.utf8)
+            fhResponse.rawResponse = data
+        }
+
+        completionHandler(fhResponse, nil)
+
     }
 }
